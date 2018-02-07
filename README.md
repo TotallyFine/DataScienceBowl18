@@ -7,13 +7,13 @@ Because of my poor laptop, i haven't run the project so there may be many bugs.
 FPN and other model will be implement, i'll run this project after next term begins.
 
 ### data overview
-'''
+```
 data
 ├── stage1_sample_submission.csv 
 ├── stage1_test 
 ├── stage1_train 
 └── stage1_train_labels.csv 
-'''
+```
 
  - (256, 256, 3)      334 
  - (256, 320, 3)      112 
@@ -26,7 +26,7 @@ data
  - (1040, 1388, 3)      1 
 
 ### project structure
-'''
+```
 Kaggle18
 ├── config.py 
 ├── data 
@@ -46,7 +46,7 @@ Kaggle18
     ├── saved_loss.csv 
     ├── saved_lr.csv 
     └── util.py 
-'''
+```
 
 
 ### Acknowledgement
