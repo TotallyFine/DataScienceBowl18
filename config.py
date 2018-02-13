@@ -19,7 +19,7 @@ class DefaultConfig(object):
     rotate = False
     
     # load data
-    batch_size = 2
+    batch_size = 2 # when testing once only load one image for rlencdoing
     num_workers = 2 # how many subprocesses
     pin_memory = False # if True loader will copy tensors in CUDA pinned memory before return them
     

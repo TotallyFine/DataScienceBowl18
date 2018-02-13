@@ -40,7 +40,7 @@ def val(data_loader, net, loss):
 def test(data_loader, net, opt):
     # when test once load one img
     net.eval()
-    # size is (height, width)
+    # size is (height, width) 
     for data, name, size in data_loader:
         data = Variable(data)
         # output is (1, 128, 128)
