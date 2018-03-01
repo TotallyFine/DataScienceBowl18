@@ -2,7 +2,7 @@
 from pathlib import Path
 from skimage import io
 from skimage.transform import resize
-from PIL.Image import NEAREST
+from Image import NEAREST
 import torch
 from torchvision import transforms
 from torch.utils import data

@@ -23,7 +23,7 @@ def main():
     if args.phase == 'train':
         # train
         dataset = NucleiDetector(opt, phase=args.phase)
-        train_loader = DataLoader(dataset, batch_size=opt.batch_size, shuffle=Ture, num_worker=opt.num_workers, pin_memory=opt.pin_memory)
+        train_loader = DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_worker=opt.num_workers, pin_memory=opt.pin_memory)
         lr = opt.lr
         optimizer = torch.optim.Adam(net.parameters(), lr=lr, weight_decay=opt.weight_decay)
         previous_loss = None # haven't run 
@@ -35,14 +35,14 @@ def main():
                     param_group['lr'] = lr
                 save_lr(net.model_name, opt.lr_save_path, lr)
             previous_loss = now_loss
-    else if args.phase == 'val':
+    elif args.phase == 'val':
         # val phase
         dataset = NucleiDetector(opt, phase='val')
         val_loader = DataLoader(dataset, batch_size=opt.batch_size, shuffle=Ture, num_worker=opt.num_workers, pin_memory=opt.pin_memory)
         val(val_loader, net, loss)   
     else:
         # test phase
-        dataset = NucleiDetector(opt, phase='val')
+        dataset = NucleiDetector(opt, phase='test')
         test_loader = DataLoader(dataset, batch_size=1, shuffle=Ture, num_worker=opt.num_workers, pin_memory=opt.pin_memory)
         test(test_loader, net, opt)
         
