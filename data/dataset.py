@@ -1,15 +1,15 @@
 # coding:utf-8
-from pathlib import Path
+import glob
 from skimage import io
 from skimage.transform import resize
-from Image import NEAREST
+from PIL.Image import NEAREST
 import torch
 from torchvision import transforms
 from torch.utils import data
 import numpy as np
 
 class NucleiDetector(data.Dataset):
-    def __init__(self, config, phase='train', imgs_trans=None, maks_trans=None):
+    def __init__(self, config, phase='train', imgs_trans=None, masks_trans=None):
         '''
         data preprocess
         root contiants all data include train imgs and test imgs
@@ -28,15 +28,15 @@ class NucleiDetector(data.Dataset):
             imgs = []
             masks = []       
             # type: generator 
-            paths = Path(root+'stage1_train/').glob('*')
+            paths = glob.glob(root+'stage1_train/*')
             # val/train = 3/10
             # get each img's path and each img's masks folder path
             for p in paths:
-                imgs.append(p / 'images' / (p.name+'.png'))
-                mask.append(p / 'masks')
+                imgs.append(glob.glob(p+'/images/*.png')[0])
+                masks.append(p+'/masks')
             if self.phase == 'train':
-                self.imgs = imgs
-                self.masks = masks
+                self.imgs = imgs[:int(0.7*len(imgs))]
+                self.masks = masks[:int(0.7*len(masks))]
                 self.imgs_num = len(self.imgs)
             # val phase
             else:
@@ -46,8 +46,8 @@ class NucleiDetector(data.Dataset):
         # test phase
         else:
             # change to list from gen
-            self.imgs = list(Path(root+'stage1_test/').glob('*/images/*.png'))
-            self.imgs_num = len(imgs)
+            self.imgs = glob.glob(root+'stage1_test/*/images/*.png')
+            self.imgs_num = len(self.imgs)
 
     def __getitem__(self, index):
         '''
@@ -62,12 +62,15 @@ class NucleiDetector(data.Dataset):
         if img.shape[2] > 3:
             assert(img[:, :, 3]!=255).sum()==0
         img = img[:, :, :3]
-        before_size = (img.shape[0], img.shape[1])
+        w, h = img.shape[0], img.shape[1]
+        assert isinstance(w, int)
+        #print(img.shape)
+        #print(img.dtype)
         if self.imgs_trans is None:
             self.imgs_trans = transforms.Compose([
                 transforms.ToPILImage(),
                 # Resize image
-                transforms.Resize((self.resize_width, self.resize_height), interpolation=NEAREST),
+                transforms.Scale((self.resize_width, self.resize_height), interpolation=NEAREST),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
             ])
@@ -75,20 +78,20 @@ class NucleiDetector(data.Dataset):
             self.masks_trans = transforms.Compose([
                 transforms.ToPILImage(),
                 # Resize image
-                transforms.Resize((self.resize_width, self.resize_height), interpolation=NEAREST),
+                transforms.Scale((self.resize_width, self.resize_height), interpolation=NEAREST),
                 transforms.ToTensor()
             ])
         # test phase has no mask
-        if phase == 'test':
+        if self.phase == 'test':
             # img name size
-            return self.imgs_trans(img), self.imgs[index].stem, before_size
+            return self.imgs_trans(img), self.imgs[index].split('/')[-3], w, h
         # compose mask and trans
         # copy from Tutorial on DSB2018
         else:
             # get this img's mask path object
             # list of all mask file
-            mask_files = list(self.masks[index].iterdir())
-            masks = np.zeros(len(mask_files), before_size[1], before_size[2])
+            mask_files = glob.glob(self.masks[index]+'/*.png')
+            masks = np.zeros((len(mask_files), w, h)).astype(np.uint8)
             for ii, mask in enumerate(mask_files):
                 mask = io.imread(mask)
                 # just verify mask contain 0 or 255
@@ -102,6 +105,11 @@ class NucleiDetector(data.Dataset):
             # ndarray.sum(0) sum the first axis
             # that is this axis disappear other dimension's size doesn't change
             mask = masks.sum(0)
+            mask = mask[:, :, np.newaxis]
+            mask = mask.astype(np.uint8)
+            #print(img.shape)
+            #print(mask.shape)
+            #print('mask dtype', mask.dtype)
             return self.imgs_trans(img), self.masks_trans(mask)
 
     def __len__(self):

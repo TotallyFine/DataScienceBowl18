@@ -3,13 +3,14 @@ import warnings
 
 class DefaultConfig(object):
     # data path
-    root = '/home/jipuzhao/user/Kaggle18/data/'
+    root = '/home/zhengdesheng/DataScienceBowl18/data/data/'
     # save
-    model_save_path = '/home/jipuzhao/user/Kaggle18/project/model/checkpoints/'
-    loss_save_path = '/home/jipuzhao/user/Kaggle18/project/utils/saved_loss.csv'
-    lr_save_path = '/home/jipuzhao/user/Kaggle18/project/utils/saved_lr.csv'
-    test_save_path = '/home/jipuzhao/user/Kaggle18/data/stage1_sample_submission.csv'
-    
+    model_save_path = '/home/zhengdesheng/DataScienceBowl18/project/model/checkpoints/'
+    loss_save_path = '/home/zhengdesheng/DataScienceBowl18/project/utils/saved_loss.csv'
+    lr_save_path = '/home/zhengdesheng/DataScienceBowl18/project/utils/saved_lr.csv'
+    test_save_path = '/home/zhengdesheng/DataScienceBowl18/data/data/stage1_sample_submission.csv'
+    ckpt_path = '/home/zhengdesheng/DataScienceBowl18/project/model/checkpoints/UNet_0310_14:46.ckpt'
+
     # data prepprocess
     resize = True
     resize_width = 128
@@ -18,13 +19,13 @@ class DefaultConfig(object):
     swap = False
     rotate = False
     
-    # load data
-    batch_size = 2 # when testing once only load one image for rlencdoing
-    num_workers = 2 # how many subprocesses
-    pin_memory = False # if True loader will copy tensors in CUDA pinned memory before return them
+    # load data 
+    batch_size = 1 # when testing once only load one image for rlencdoing
+    num_workers = 8 # how many subprocesses
+    pin_memory = True # if True loader will copy tensors in CUDA pinned memory before return them
     
     # train
-    use_gpu = False
+    use_gpu = True
     lr = 1e-3
     lr_decay = 0.6
     weight_decay = 1e-4
@@ -35,7 +36,7 @@ class DefaultConfig(object):
     
     
     # if epoch%save_freq == 0: save
-    model_save_freq = 1
+    model_save_freq = 5
     
 
 opt = DefaultConfig()
